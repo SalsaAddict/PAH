@@ -1,0 +1,7 @@
+[
+  {
+    "outputFileName": "scripts/pah/main.js",
+    "inputFiles": [ "scripts/pah/main.js" ],
+    "minify": { "enabled": true }
+  }
+]
