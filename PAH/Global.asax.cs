@@ -12,8 +12,12 @@ namespace PAH
         }
         public static void RegisterRoutes(RouteCollection routes)
         {
-            routes.MapPageRoute("Main", "main/{LocaleId}", "~/index.aspx", false,
-                new RouteValueDictionary { { "LocaleId", WebConfigurationManager.AppSettings["DefaultLocaleId"] } });
+            routes.MapPageRoute("Main", "main.aspx/{Locale}", "~/index.aspx", false,
+                new RouteValueDictionary { { "Locale", DefaultLocale } });
         }
+        public static string AngularVersion { get { return WebConfigurationManager.AppSettings["AngularVersion"]; } }
+        public static string MaterialVersion { get { return WebConfigurationManager.AppSettings["MaterialVersion"]; } }
+        public static string DefaultLocale { get { return WebConfigurationManager.AppSettings["DefaultLocale"]; } }
+        public static string AngularDebug { get { return WebConfigurationManager.AppSettings["AngularDebug"]; } }
     }
 }

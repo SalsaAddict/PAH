@@ -1,26 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 using System.Web.UI;
-using System.Web.UI.WebControls;
-using System.Web.Configuration;
 
 namespace PAH
 {
-    public partial class index : System.Web.UI.Page
+    public partial class Index : System.Web.UI.Page
     {
-        protected void Page_Load(object sender, EventArgs e)
+        public string Locale()
         {
-
-        }
-        public string LocaleId()
-        {
-            if (Page.RouteData.Values["LocaleId"] == null)
-            {
-                return WebConfigurationManager.AppSettings["DefaultLocaleId"];
-            }
-            return Page.RouteData.Values["LocaleId"].ToString();
+            if (Page.RouteData.Values["Locale"] == null) return Global.DefaultLocale;
+            return Page.RouteData.Values["Locale"].ToString();
         }
         public string CDNJS(string Library, string Version, string Filename)
         {
@@ -28,7 +16,15 @@ namespace PAH
         }
         public string AngularResource(string Filename)
         {
-            return CDNJS("angular.js", WebConfigurationManager.AppSettings["AngularVersion"], Filename);
+            return CDNJS("angular.js", Global.AngularVersion, Filename);
+        }
+        public string AngularLocaleScript()
+        {
+            return CDNJS("angular-i18n", Global.AngularVersion, string.Format("angular-locale_{0}.js", Locale()));
+        }
+        public string MaterialResource(string Filename)
+        {
+            return CDNJS("angular-material", Global.MaterialVersion, Filename);
         }
     }
 }

@@ -10,6 +10,6 @@
 namespace PAH {
     
     
-    public partial class index {
+    public partial class Index {
     }
 }

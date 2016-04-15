@@ -1,7 +1,14 @@
 [
   {
-    "outputFileName": "scripts/pah/main.js",
-    "inputFiles": [ "scripts/pah/main.js" ],
-    "minify": { "enabled": true }
+    "outputFileName": "scripts/pah/pah.js",
+    "inputFiles": [
+      "scripts/pah/pah.js"
+    ]
+  },
+  {
+    "outputFileName": "scripts/pah/app.js",
+    "inputFiles": [
+      "scripts/pah/app.js"
+    ]
   }
 ]

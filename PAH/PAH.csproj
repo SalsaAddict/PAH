@@ -68,11 +68,17 @@
     <Reference Include="System.EnterpriseServices" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="channel.html" />
     <Content Include="Global.asax" />
     <Content Include="index.aspx" />
     <Content Include="packages.config" />
-    <Content Include="scripts\pah\main.js.map" />
     <None Include="bundleconfig.json" />
+    <Content Include="scripts\pah\app.js" />
+    <Content Include="scripts\pah\app.min.js">
+      <DependentUpon>app.js</DependentUpon>
+    </Content>
+    <Content Include="scripts\pah\pah.js.map" />
+    <Content Include="scripts\pah\app.js.map" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -82,13 +88,10 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="scripts\_references.js" />
-    <Content Include="index.html" />
-    <Content Include="scripts\pah\main.js" />
-    <Content Include="scripts\pah\main.min.js">
-      <DependentUpon>main.js</DependentUpon>
+    <Content Include="scripts\pah\pah.js" />
+    <Content Include="scripts\pah\pah.min.js">
+      <DependentUpon>pah.js</DependentUpon>
     </Content>
-    <Content Include="scripts\r.js" />
-    <Content Include="scripts\require.js" />
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
@@ -109,7 +112,8 @@
     <Folder Include="fonts\" />
   </ItemGroup>
   <ItemGroup>
-    <TypeScriptCompile Include="scripts\pah\main.ts" />
+    <TypeScriptCompile Include="scripts\pah\app.ts" />
+    <TypeScriptCompile Include="scripts\pah\pah.ts" />
     <TypeScriptCompile Include="scripts\typings\angularjs\angular-animate.d.ts" />
     <TypeScriptCompile Include="scripts\typings\angularjs\angular-component-router.d.ts" />
     <TypeScriptCompile Include="scripts\typings\angularjs\angular-cookies.d.ts" />
@@ -119,7 +123,6 @@
     <TypeScriptCompile Include="scripts\typings\angularjs\angular-sanitize.d.ts" />
     <TypeScriptCompile Include="scripts\typings\angularjs\angular.d.ts" />
     <TypeScriptCompile Include="scripts\typings\jquery\jquery.d.ts" />
-    <TypeScriptCompile Include="scripts\typings\requirejs\require.d.ts" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{4A0DDDB5-7A95-4FBF-97CC-616D07737A77}" />
@@ -156,6 +159,8 @@
           <DevelopmentServerPort>49638</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
           <IISUrl>http://localhost:49638/</IISUrl>
+          <OverrideIISAppRootUrl>True</OverrideIISAppRootUrl>
+          <IISAppRootUrl>http://localhost:49638/</IISAppRootUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>

@@ -1,4 +1,3 @@
 ﻿/// <autosync enabled="true" />
-/// <reference path="pah/main.js" />
-/// <reference path="r.js" />
-/// <reference path="require.js" />
+/// <reference path="pah/app.js" />
+/// <reference path="pah/pah.js" />
