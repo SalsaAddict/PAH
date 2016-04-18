@@ -1,4 +1,5 @@
 ﻿/// <reference path="../typings/angularjs/angular.d.ts" />
+/// <reference path="../typings/angular-material/angular-material.d.ts" />
 
 declare var FB: any;
 
@@ -18,39 +19,45 @@ pah.config(["$logProvider", function ($logProvider: angular.ILogProvider) {
     $logProvider.debugEnabled(document.getElementById("pahScript").getAttribute("data-debug") === "true");
 }]);
 
-pah.run(["$window", "$rootScope", "$locale", "$log", function (
+pah.run(["$window", "$rootScope", "$locale", "$mdToast", "$log", function (
     $window: PAH.IWindowService,
     $rootScope: PAH.IRootScopeService,
     $locale: angular.ILocaleService,
+    $mdToast: angular.material.IToastService,
     $log: angular.ILogService) {
     $window.fbAsyncInit = function () {
         FB.Event.subscribe("auth.authResponseChange", function (response: any) {
             if (response.status === "connected") {
-                FB.api("/me", { access_token: response.authResponse.accessToken }, function (response: any) {
+                FB.api("/me", {
+                    access_token: response.authResponse.accessToken,
+                    fields: ["first_name", "last_name", "gender", "birthday", "email", "timezone", "locale"]
+                }, function (response: any) {
                     $rootScope.$apply(() => {
                         $rootScope.user = response;
-                        $log.debug("FB login");
+                        $mdToast.show($mdToast.simple().textContent("Hello " + $rootScope.user.first_name + "!").position("top right"));
+                        $log.debug("FB login", response);
                     });
                 });
             } else {
                 $rootScope.$apply(function () {
+                    $mdToast.show($mdToast.simple().textContent("Goodbye " + $rootScope.user.first_name + "!").position("top right"));
                     delete $rootScope.user;
-                    $log.debug("FB logout");
+                    $log.debug("FB logout", response);
                 });
             }
-            $log.debug(response);
         });
-        FB.init({
+        var fbInit: any = {
             appId: "693765580666719",
             channelUrl: "channel.html",
             status: true,
             cookie: true,
             xfbml: true,
             version: "v2.5"
-        });
+        };
+        FB.init(fbInit);
+        $log.debug("FB init", fbInit);
         $rootScope.login = function () { FB.login(); }
         $rootScope.logout = function () { FB.logout(); }
-        $log.debug("FB init");
     };
-    $log.debug("PAH running (" + $locale.id + ")");
+    $log.debug("PAH running (", $locale.id, ")");
 }]);
