@@ -20,6 +20,7 @@
             <md-button ng-show="user" ng-click="logout()">Logout</md-button>
         </div>
     </md-toolbar>
+    {{user}}
     <script src="<%=this.AngularResource("angular.min.js")%>"></script>
     <script src="<%=this.AngularLocaleScript()%>"></script>
     <script src="<%=this.AngularResource("angular-route.min.js")%>"></script>
