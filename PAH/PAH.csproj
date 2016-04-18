@@ -114,9 +114,6 @@
   <ItemGroup>
     <TypeScriptCompile Include="scripts\pah\app.ts" />
     <TypeScriptCompile Include="scripts\pah\pah.ts" />
-    <TypeScriptCompile Include="scripts\typings\angular-material\angular-material-0.8.3.d.ts" />
-    <TypeScriptCompile Include="scripts\typings\angular-material\angular-material-0.9.0.d.ts" />
-    <TypeScriptCompile Include="scripts\typings\angular-material\angular-material.d.ts" />
     <TypeScriptCompile Include="scripts\typings\angularjs\angular-animate.d.ts" />
     <TypeScriptCompile Include="scripts\typings\angularjs\angular-component-router.d.ts" />
     <TypeScriptCompile Include="scripts\typings\angularjs\angular-cookies.d.ts" />

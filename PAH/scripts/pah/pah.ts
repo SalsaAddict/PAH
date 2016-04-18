@@ -1,5 +1,4 @@
 ﻿/// <reference path="../typings/angularjs/angular.d.ts" />
-/// <reference path="../typings/angular-material/angular-material.d.ts" />
 
 declare var FB: any;
 
@@ -11,19 +10,30 @@ module PAH {
         login: Function;
         logout: Function;
     }
+    export module Toast {
+        export class Service {
+            static $inject: string[] = ["$mdToast"];
+            constructor(private $mdToast: any) { }
+            showSimple = (message: string) => {
+                this.$mdToast.show(this.$mdToast.simple().textContent(message).position("top right"));
+            }
+        }
+    }
 }
 
 var pah: angular.IModule = angular.module("pah", ["ngRoute", "ngMaterial"]);
+
+pah.service("$pahToast", PAH.Toast.Service);
 
 pah.config(["$logProvider", function ($logProvider: angular.ILogProvider) {
     $logProvider.debugEnabled(document.getElementById("pahScript").getAttribute("data-debug") === "true");
 }]);
 
-pah.run(["$window", "$rootScope", "$locale", "$mdToast", "$log", function (
+pah.run(["$window", "$rootScope", "$locale", "$pahToast", "$log", function (
     $window: PAH.IWindowService,
     $rootScope: PAH.IRootScopeService,
     $locale: angular.ILocaleService,
-    $mdToast: angular.material.IToastService,
+    $pahToast: PAH.Toast.Service,
     $log: angular.ILogService) {
     $window.fbAsyncInit = function () {
         FB.Event.subscribe("auth.authResponseChange", function (response: any) {
@@ -32,15 +42,15 @@ pah.run(["$window", "$rootScope", "$locale", "$mdToast", "$log", function (
                     access_token: response.authResponse.accessToken,
                     fields: ["first_name", "last_name", "gender", "birthday", "email", "timezone", "locale"]
                 }, function (response: any) {
-                    $rootScope.$apply(() => {
+                    $rootScope.$apply(function () {
                         $rootScope.user = response;
-                        $mdToast.show($mdToast.simple().textContent("Hello " + $rootScope.user.first_name + "!").position("top right"));
+                        $pahToast.showSimple("Hello " + $rootScope.user.first_name + "!");
                         $log.debug("FB login", response);
                     });
                 });
             } else {
                 $rootScope.$apply(function () {
-                    $mdToast.show($mdToast.simple().textContent("Goodbye " + $rootScope.user.first_name + "!").position("top right"));
+                    $pahToast.showSimple("Goodbye " + $rootScope.user.first_name + "!");
                     delete $rootScope.user;
                     $log.debug("FB logout", response);
                 });
