@@ -15,12 +15,21 @@
 <body ng-cloak>
     <md-toolbar>
         <div class="md-toolbar-tools">
+            <md-button ng-click="$pah.toggleMenu()">Menu</md-button>
             <span flex></span>
-            <md-button ng-hide="user" ng-click="login()">Login</md-button>
-            <md-button ng-show="user" ng-click="logout()">Logout</md-button>
+            <md-button ng-hide="user" ng-click="$pah.login()">Login</md-button>
+            <md-button ng-show="user" ng-click="$pah.logout()">
+                Logout
+                <md-tooltip>Currently logged in as {{user.name}}</md-tooltip>
+            </md-button>
         </div>
     </md-toolbar>
-    {{user}}
+    <md-sidenav md-component-id="left" md-is-locked-open="$mdMedia('gt-sm')" class="md-sidenav-left">
+        Left nav
+    </md-sidenav>
+    <md-content layout="row">
+        {{user}}
+    </md-content>
     <script src="<%=this.AngularResource("angular.min.js")%>"></script>
     <script src="<%=this.AngularLocaleScript()%>"></script>
     <script src="<%=this.AngularResource("angular-route.min.js")%>"></script>

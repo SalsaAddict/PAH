@@ -4,54 +4,78 @@ declare var FB: any;
 
 module PAH {
     "option strict";
-    export interface IWindowService extends angular.IWindowService { fbAsyncInit: Function; }
-    export interface IRootScopeService extends angular.IRootScopeService {
-        user: any;
-        login: Function;
-        logout: Function;
+    export interface IFacebookUser {
+        id: string;
+        name: string;
+        first_name: string;
+        last_name: string;
+        gender: string;
+        birthday: string;
+        email: string;
+        locale: string;
+        timezone: string;
     }
-    export module Toast {
-        export class Service {
-            static $inject: string[] = ["$mdToast"];
-            constructor(private $mdToast: any) { }
-            showSimple = (message: string) => {
-                this.$mdToast.show(this.$mdToast.simple().textContent(message).position("top right"));
-            }
+    export class Service {
+        static $inject: string[] = ["$mdToast", "$mdSidenav", "$log"];
+        constructor(
+            private $mdToast: any,
+            private $mdSidenav: any,
+            private $log: angular.ILogService) { }
+        user: IFacebookUser = undefined;
+        login = () => { FB.login(); }
+        logout = () => { FB.logout(); }
+        toggleMenu = () => {
+            this.$mdSidenav("left").toggle();
+            this.$log.debug("PAH toggleMenu");
+        }
+        toast = (message: string) => {
+            this.$mdToast.show(this.$mdToast.simple().textContent(message).position("top right"));
         }
     }
+    export interface IWindowService extends angular.IWindowService { fbAsyncInit: Function; }
+    export interface IRootScopeService extends angular.IRootScopeService { $pah: Service }
 }
 
 var pah: angular.IModule = angular.module("pah", ["ngRoute", "ngMaterial"]);
 
-pah.service("$pahToast", PAH.Toast.Service);
+pah.service("$pah", PAH.Service);
 
-pah.config(["$logProvider", function ($logProvider: angular.ILogProvider) {
+pah.config(["$logProvider", "$mdThemingProvider", function (
+    $logProvider: angular.ILogProvider,
+    $mdThemingProvider: any) {
     $logProvider.debugEnabled(document.getElementById("pahScript").getAttribute("data-debug") === "true");
+    $mdThemingProvider.theme("default")
+        .primaryPalette("blue")
+        .accentPalette("teal")
+        .warnPalette("red")
+        .backgroundPalette("grey");
 }]);
 
-pah.run(["$window", "$rootScope", "$locale", "$pahToast", "$log", function (
+pah.run(["$window", "$rootScope", "$locale", "$pah", "$mdSidenav", "$log", function (
     $window: PAH.IWindowService,
     $rootScope: PAH.IRootScopeService,
     $locale: angular.ILocaleService,
-    $pahToast: PAH.Toast.Service,
+    $pah: PAH.Service,
+    $mdSidenav: any,
     $log: angular.ILogService) {
+    $rootScope.$pah = $pah;
     $window.fbAsyncInit = function () {
         FB.Event.subscribe("auth.authResponseChange", function (response: any) {
             if (response.status === "connected") {
                 FB.api("/me", {
                     access_token: response.authResponse.accessToken,
-                    fields: ["first_name", "last_name", "gender", "birthday", "email", "timezone", "locale"]
+                    fields: ["id", "name", "first_name", "last_name", "gender", "birthday", "email", "timezone", "locale"]
                 }, function (response: any) {
                     $rootScope.$apply(function () {
-                        $rootScope.user = response;
-                        $pahToast.showSimple("Hello " + $rootScope.user.first_name + "!");
+                        $pah.user = response;
+                        $pah.toast("Hello " + $pah.user.first_name + "!");
                         $log.debug("FB login", response);
                     });
                 });
             } else {
                 $rootScope.$apply(function () {
-                    $pahToast.showSimple("Goodbye " + $rootScope.user.first_name + "!");
-                    delete $rootScope.user;
+                    $pah.toast("Goodbye " + $pah.user.first_name + "!");
+                    delete $pah.user;
                     $log.debug("FB logout", response);
                 });
             }
@@ -66,8 +90,6 @@ pah.run(["$window", "$rootScope", "$locale", "$pahToast", "$log", function (
         };
         FB.init(fbInit);
         $log.debug("FB init", fbInit);
-        $rootScope.login = function () { FB.login(); }
-        $rootScope.logout = function () { FB.logout(); }
     };
     $log.debug("PAH running (", $locale.id, ")");
 }]);
