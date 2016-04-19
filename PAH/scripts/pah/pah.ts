@@ -1,6 +1,6 @@
 ﻿/// <reference path="../typings/angularjs/angular.d.ts" />
 
-declare var FB: any;
+declare var FB: any, YT: any;
 
 module PAH {
     "option strict";
@@ -32,7 +32,10 @@ module PAH {
             this.$mdToast.show(this.$mdToast.simple().textContent(message).position("top right"));
         }
     }
-    export interface IWindowService extends angular.IWindowService { fbAsyncInit: Function; }
+    export interface IWindowService extends angular.IWindowService {
+        fbAsyncInit: Function;
+        onYouTubeIframeAPIReady: Function;
+    }
     export interface IRootScopeService extends angular.IRootScopeService { $pah: Service }
 }
 
@@ -90,6 +93,21 @@ pah.run(["$window", "$rootScope", "$locale", "$pah", "$mdSidenav", "$log", funct
         };
         FB.init(fbInit);
         $log.debug("FB init", fbInit);
+    };
+    $window.onYouTubeIframeAPIReady = function () {
+        var player = new YT.Player('ytplayer', {
+            height: '390',
+            width: '640',
+            events: {
+                onReady: function (event: any) {
+                    event.target.loadVideoById("TMq5USWW4vU");
+                },
+                onStateChange: function (event: any) {
+                    $log.debug(event.target.getVideoData());
+                }
+            }
+        });
+        $log.debug("FB onYouTubeIframeAPIReady");
     };
     $log.debug("PAH running (", $locale.id, ")");
 }]);

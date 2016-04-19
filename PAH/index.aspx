@@ -28,7 +28,7 @@
         Left nav
     </md-sidenav>
     <md-content layout="row">
-        {{user}}
+        <div id="ytplayer"></div>
     </md-content>
     <script src="<%=this.AngularResource("angular.min.js")%>"></script>
     <script src="<%=this.AngularLocaleScript()%>"></script>
@@ -40,5 +40,6 @@
     <script id="pahScript" src="scripts/pah/pah.min.js" data-debug="<%=PAH.Global.AngularDebug%>"></script>
     <script src="scripts/pah/app.min.js"></script>
     <script src="//connect.facebook.net/en_US/sdk.js"></script>
+    <script src="//www.youtube.com/iframe_api"></script>
 </body>
 </html>

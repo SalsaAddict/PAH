@@ -21,7 +21,7 @@ var PAH;
         }
         Service.$inject = ["$mdToast", "$mdSidenav", "$log"];
         return Service;
-    }());
+    })();
     PAH.Service = Service;
 })(PAH || (PAH = {}));
 var pah = angular.module("pah", ["ngRoute", "ngMaterial"]);
@@ -68,6 +68,21 @@ pah.run(["$window", "$rootScope", "$locale", "$pah", "$mdSidenav", "$log", funct
             };
             FB.init(fbInit);
             $log.debug("FB init", fbInit);
+        };
+        $window.onYouTubeIframeAPIReady = function () {
+            var player = new YT.Player('ytplayer', {
+                height: '390',
+                width: '640',
+                events: {
+                    onReady: function (event) {
+                        event.target.loadVideoById("TMq5USWW4vU");
+                    },
+                    onStateChange: function (event) {
+                        $log.debug(event.target.getVideoData());
+                    }
+                }
+            });
+            $log.debug("FB onYouTubeIframeAPIReady");
         };
         $log.debug("PAH running (", $locale.id, ")");
     }]);
