@@ -13,7 +13,7 @@
     </style>
 </head>
 <body ng-cloak>
-    <md-toolbar>
+    <md-toolbar class="md-hue-2">
         <div class="md-toolbar-tools">
             <md-button ng-click="$pah.toggleMenu()">Menu</md-button>
             <span flex></span>
@@ -24,11 +24,11 @@
             </md-button>
         </div>
     </md-toolbar>
-    <md-sidenav md-component-id="left" md-is-locked-open="$mdMedia('gt-sm')" class="md-sidenav-left">
+    <md-sidenav md-component-id="left" class="md-sidenav-left">
         Left nav
     </md-sidenav>
-    <md-content layout="row">
-        <div id="ytplayer"></div>
+    <md-content layout="row" layout-padding>
+        <ng-view flex></ng-view>
     </md-content>
     <script src="<%=this.AngularResource("angular.min.js")%>"></script>
     <script src="<%=this.AngularLocaleScript()%>"></script>

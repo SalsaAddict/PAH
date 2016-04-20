@@ -1,0 +1,51 @@
+﻿<md-card ng-show="ctrl.step === 1">
+    <md-toolbar>
+        <div class="md-toolbar-tools">
+            <span>YouTube Video</span>
+            <span flex></span>
+            <span><small>Step 1 of 3</small></span>
+        </div>
+    </md-toolbar>
+    <md-card-title>
+        <md-card-title-text>
+            <span>Copy-and-paste a link to a YouTube video of the song that you want to recommend&hellip;</span>
+        </md-card-title-text>
+    </md-card-title>
+    <md-card-content>
+        <form>
+            <md-input-container class="md-block" md-no-float>
+                <input ng-model="ctrl.url" placeholder="e.g. https://www.youtube.com/watch?v=XbAM2_6jKY0" />
+            </md-input-container>
+        </form>
+    </md-card-content>
+    <md-card-actions layout="row" layout-align="end center">
+        <md-button ng-click="ctrl.getYouTubeInfo()">Next</md-button>
+    </md-card-actions>
+</md-card>
+<md-card ng-show="ctrl.step === 2">
+    <md-toolbar>
+        <div class="md-toolbar-tools">
+            <span>Song Details</span>
+            <span flex></span>
+            <span><small>Step 2 of 3</small></span>
+        </div>
+    </md-toolbar>
+    <img class="md-card-image" ng-src="{{ctrl.info.thumbnail}}" />
+    <md-card-content>
+        <md-input-container class="md-block">
+            <label>Song Title</label>
+            <input ng-model="ctrl.info.title" required />
+        </md-input-container>
+        <md-input-container class="md-block">
+            <label>Artist</label>
+            <input ng-model="ctrl.info.artist" required />
+        </md-input-container>
+        <md-input-container class="md-block">
+            <label>Dance Genre</label>
+            <md-select ng-model="ctrl.genreId">
+                <md-option>Salsa</md-option>
+            </md-select>
+        </md-input-container>
+    </md-card-content>
+</md-card>
+{{ctrl.info}}

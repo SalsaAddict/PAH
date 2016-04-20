@@ -70,6 +70,7 @@
   <ItemGroup>
     <Content Include="channel.html" />
     <Content Include="Global.asax" />
+    <Content Include="img\YouTube-logo-full_color.png" />
     <Content Include="index.aspx" />
     <Content Include="packages.config" />
     <None Include="bundleconfig.json" />
@@ -92,6 +93,9 @@
     <Content Include="scripts\pah\pah.min.js">
       <DependentUpon>pah.js</DependentUpon>
     </Content>
+    <Content Include="sql\1. Setup.sql" />
+    <Content Include="views\home.html" />
+    <Content Include="views\search.html" />
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
