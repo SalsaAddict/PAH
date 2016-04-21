@@ -2,21 +2,21 @@ USE [master]
 GO
 
 DECLARE @dbid INT
-SET @dbid = DB_ID(N'MYDC')
+SET @dbid = DB_ID(N'GoodMusic')
 IF @dbid IS NOT NULL BEGIN
 	DECLARE @sql NVARCHAR(max)
 	SELECT @sql = ISNULL(@sql + N';', N'') + N'KILL ' + CONVERT(NVARCHAR(10), [spid])
 	FROM sys.sysprocesses
 	WHERE [dbid] = @dbid
 	EXEC (@SQL)
-	DROP DATABASE [MYDC]
+	DROP DATABASE [GoodMusic]
 END
 GO
 
-CREATE DATABASE [MYDC]
+CREATE DATABASE [GoodMusic]
 GO
 
-USE [MYDC]
+USE [GoodMusic]
 GO
 
 CREATE TABLE [Gender] (
@@ -53,6 +53,24 @@ CREATE TABLE [Genre] (
 		CONSTRAINT [PK_Genre] PRIMARY KEY NONCLUSTERED ([Id]),
 		CONSTRAINT [UQ_Genre_Name] UNIQUE CLUSTERED ([Name])
 	)
+GO
+
+CREATE PROCEDURE [apiGenres]
+AS
+BEGIN
+	SET NOCOUNT ON
+	SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED
+	;WITH XMLNAMESPACES (N'http://james.newtonking.com/projects/json' AS [json])
+	SELECT
+		[@json:Array] = N'true',
+		[Id],
+		[Name]
+	FROM [Genre]
+	WITH (NOLOCK)
+	ORDER BY [Name]
+	FOR XML PATH (N'array'), ROOT (N'data')
+	RETURN
+END
 GO
 
 SET IDENTITY_INSERT [Genre] ON
@@ -151,5 +169,3 @@ VALUES
 	(1, N'FRUBI2Lw5J4', N'Super Héroe', N'Tony Dize', 2, 2, 706460439)
 SET IDENTITY_INSERT [Song] OFF
 GO
-
-INSERT INTO [Review] ([SongId], [GenreId], [StyleId], [Recommend], [UserId])

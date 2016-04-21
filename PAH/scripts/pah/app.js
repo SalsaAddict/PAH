@@ -1,8 +1,27 @@
 /// <reference path="../typings/angularjs/angular.d.ts" />
+/// <reference path="../typings/angularjs/angular-route.d.ts" />
 var APP;
 (function (APP) {
     "option strict";
     APP.googleApiKey = "AIzaSyCtuJp3jsaJp3X6U8ZS_X5H8omiAw5QaHg";
+    var Home;
+    (function (Home) {
+        var Controller = (function () {
+            function Controller($scope, $pah, $log) {
+                var _this = this;
+                this.$scope = $scope;
+                this.$pah = $pah;
+                this.$log = $log;
+                $pah.execute({ name: "apiGenres", nonQuery: false }).then(function (response) {
+                    _this.$scope.data = response.data;
+                    _this.$log.debug(Object.getOwnPropertyNames(response.data.data));
+                });
+            }
+            Controller.$inject = ["$scope", "$pah", "$log"];
+            return Controller;
+        }());
+        Home.Controller = Controller;
+    })(Home = APP.Home || (APP.Home = {}));
     var Search;
     (function (Search) {
         var Controller = (function () {
@@ -61,15 +80,16 @@ var APP;
     })(Search = APP.Search || (APP.Search = {}));
 })(APP || (APP = {}));
 var app = angular.module("app", ["ngRoute", "pah"]);
+app.controller("HomeController", APP.Home.Controller);
 app.controller("SearchController", APP.Search.Controller);
 app.config(["$routeProvider", function ($routeProvider) {
-        $routeProvider
-            .when("/home", { caseInsensitiveMatch: true, templateUrl: "views/home.html" })
-            .when("/search", { caseInsensitiveMatch: true, templateUrl: "views/search.html", controller: "SearchController", controllerAs: "ctrl" })
-            .when("/submit", { caseInsensitiveMatch: true, templateUrl: "views/submit.html" })
-            .otherwise({ redirectTo: "/search" });
+        var createRoute = function (path, templateUrl, controller, controllerAs) {
+            $routeProvider.when(path, { caseInsensitiveMatch: true, templateUrl: templateUrl, controller: controller, controllerAs: controllerAs });
+        };
+        createRoute("/home", "views/home.html", "HomeController", "ctrl");
+        createRoute("/search", "views/search.html", "SearchController", "ctrl");
+        $routeProvider.otherwise({ redirectTo: "/home" });
     }]);
 app.run(["$log", function ($log) {
         $log.debug("APP running");
     }]);
-//# sourceMappingURL=app.js.map

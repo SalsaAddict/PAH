@@ -1,0 +1,5 @@
+﻿{
+  "compileOnSave": true,
+  "compilerOptions": { "target": "ES5" },
+  "exclude": [ "typings" ]
+}

@@ -19,5 +19,6 @@ namespace PAH
         public static string MaterialVersion { get { return WebConfigurationManager.AppSettings["MaterialVersion"]; } }
         public static string DefaultLocale { get { return WebConfigurationManager.AppSettings["DefaultLocale"]; } }
         public static string AngularDebug { get { return WebConfigurationManager.AppSettings["AngularDebug"]; } }
+        public static string ConnectionString { get { return WebConfigurationManager.ConnectionStrings["Database"].ConnectionString; } }
     }
 }

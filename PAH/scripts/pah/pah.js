@@ -1,10 +1,40 @@
 /// <reference path="../typings/angularjs/angular.d.ts" />
+/// <reference path="../typings/angular-material/angular-material.d.ts" />
 var PAH;
 (function (PAH) {
     "option strict";
+    function IsBlank(expression) {
+        if (expression === undefined) {
+            return true;
+        }
+        if (expression === null) {
+            return true;
+        }
+        if (expression === NaN) {
+            return true;
+        }
+        if (expression === {}) {
+            return true;
+        }
+        if (expression === []) {
+            return true;
+        }
+        if (String(expression).trim().length === 0) {
+            return true;
+        }
+        return false;
+    }
+    PAH.IsBlank = IsBlank;
+    function IfBlank(expression, defaultValue) {
+        if (defaultValue === void 0) { defaultValue = undefined; }
+        return (IsBlank(expression)) ? defaultValue : expression;
+    }
+    PAH.IfBlank = IfBlank;
     var Service = (function () {
-        function Service($mdToast, $mdSidenav, $log) {
+        function Service($rootScope, $http, $mdToast, $mdSidenav, $log) {
             var _this = this;
+            this.$rootScope = $rootScope;
+            this.$http = $http;
             this.$mdToast = $mdToast;
             this.$mdSidenav = $mdSidenav;
             this.$log = $log;
@@ -18,8 +48,11 @@ var PAH;
             this.toast = function (message) {
                 _this.$mdToast.show(_this.$mdToast.simple().textContent(message).position("top right"));
             };
+            this.execute = function (procedure) {
+                return _this.$http.post("/execute.ashx", procedure);
+            };
         }
-        Service.$inject = ["$mdToast", "$mdSidenav", "$log"];
+        Service.$inject = ["$rootScope", "$http", "$mdToast", "$mdSidenav", "$log"];
         return Service;
     }());
     PAH.Service = Service;
@@ -37,16 +70,16 @@ pah.config(["$logProvider", "$mdThemingProvider", function ($logProvider, $mdThe
 pah.run(["$window", "$rootScope", "$locale", "$pah", "$mdSidenav", "$log", function ($window, $rootScope, $locale, $pah, $mdSidenav, $log) {
         $rootScope.$pah = $pah;
         $window.fbAsyncInit = function () {
-            FB.Event.subscribe("auth.authResponseChange", function (response) {
-                if (response.status === "connected") {
+            FB.Event.subscribe("auth.authResponseChange", function (authResponse) {
+                if (authResponse.status === "connected") {
                     FB.api("/me", {
-                        access_token: response.authResponse.accessToken,
+                        access_token: authResponse.authResponse.accessToken,
                         fields: ["id", "name", "first_name", "last_name", "gender", "birthday", "email", "timezone", "locale"]
-                    }, function (response) {
+                    }, function (apiResponse) {
                         $rootScope.$apply(function () {
-                            $pah.user = response;
+                            $pah.user = apiResponse;
                             $pah.toast("Hello " + $pah.user.first_name + "!");
-                            $log.debug("FB login", response);
+                            $log.debug("FB login", apiResponse);
                         });
                     });
                 }
@@ -54,13 +87,12 @@ pah.run(["$window", "$rootScope", "$locale", "$pah", "$mdSidenav", "$log", funct
                     $rootScope.$apply(function () {
                         $pah.toast("Goodbye " + $pah.user.first_name + "!");
                         delete $pah.user;
-                        $log.debug("FB logout", response);
+                        $log.debug("FB logout", authResponse);
                     });
                 }
             });
             var fbInit = {
                 appId: "693765580666719",
-                channelUrl: "channel.html",
                 status: true,
                 cookie: true,
                 xfbml: true,
@@ -71,4 +103,3 @@ pah.run(["$window", "$rootScope", "$locale", "$pah", "$mdSidenav", "$log", funct
         };
         $log.debug("PAH running (", $locale.id, ")");
     }]);
-//# sourceMappingURL=pah.js.map

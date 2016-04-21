@@ -50,6 +50,10 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.8.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System.Web.DynamicData" />
     <Reference Include="System.Web.Entity" />
     <Reference Include="System.Web.ApplicationServices" />
@@ -68,7 +72,6 @@
     <Reference Include="System.EnterpriseServices" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="channel.html" />
     <Content Include="Global.asax" />
     <Content Include="img\YouTube-logo-full_color.png" />
     <Content Include="index.aspx" />
@@ -80,6 +83,8 @@
     </Content>
     <Content Include="scripts\pah\pah.js.map" />
     <Content Include="scripts\pah\app.js.map" />
+    <Content Include="scripts\tsconfig.json" />
+    <Content Include="execute.ashx" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -99,6 +104,9 @@
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="execute.ashx.cs">
+      <DependentUpon>execute.ashx</DependentUpon>
+    </Compile>
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -118,6 +126,9 @@
   <ItemGroup>
     <TypeScriptCompile Include="scripts\pah\app.ts" />
     <TypeScriptCompile Include="scripts\pah\pah.ts" />
+    <TypeScriptCompile Include="scripts\typings\angular-material\angular-material-0.8.3.d.ts" />
+    <TypeScriptCompile Include="scripts\typings\angular-material\angular-material-0.9.0.d.ts" />
+    <TypeScriptCompile Include="scripts\typings\angular-material\angular-material.d.ts" />
     <TypeScriptCompile Include="scripts\typings\angularjs\angular-animate.d.ts" />
     <TypeScriptCompile Include="scripts\typings\angularjs\angular-component-router.d.ts" />
     <TypeScriptCompile Include="scripts\typings\angularjs\angular-cookies.d.ts" />

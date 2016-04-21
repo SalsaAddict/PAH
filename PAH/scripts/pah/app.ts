@@ -1,8 +1,24 @@
 ﻿/// <reference path="../typings/angularjs/angular.d.ts" />
+/// <reference path="../typings/angularjs/angular-route.d.ts" />
 
 module APP {
     "option strict";
     export const googleApiKey: string = "AIzaSyCtuJp3jsaJp3X6U8ZS_X5H8omiAw5QaHg";
+    export module Home {
+        export interface IScope extends angular.IScope { data: any; }
+        export class Controller {
+            static $inject: string[] = ["$scope", "$pah", "$log"];
+            constructor(
+                private $scope: IScope,
+                private $pah: PAH.Service,
+                private $log: angular.ILogService) {
+                $pah.execute({ name: "apiGenres", nonQuery: false }).then((response: any) => {
+                    this.$scope.data = response.data;
+                    this.$log.debug(Object.getOwnPropertyNames(response.data.data));
+                });
+            }
+        }
+    }
     export module Search {
         export interface IScope extends angular.IScope { }
         export class Controller {
@@ -46,14 +62,16 @@ module APP {
 
 var app: angular.IModule = angular.module("app", ["ngRoute", "pah"]);
 
+app.controller("HomeController", APP.Home.Controller);
 app.controller("SearchController", APP.Search.Controller);
 
 app.config(["$routeProvider", function ($routeProvider: angular.route.IRouteProvider) {
-    $routeProvider
-        .when("/home", { caseInsensitiveMatch: true, templateUrl: "views/home.html" })
-        .when("/search", { caseInsensitiveMatch: true, templateUrl: "views/search.html", controller: "SearchController", controllerAs: "ctrl" })
-        .when("/submit", { caseInsensitiveMatch: true, templateUrl: "views/submit.html" })
-        .otherwise({ redirectTo: "/search" });
+    var createRoute = function (path: string, templateUrl: string, controller?: string, controllerAs?: string) {
+        $routeProvider.when(path, { caseInsensitiveMatch: true, templateUrl: templateUrl, controller: controller, controllerAs: controllerAs });
+    }
+    createRoute("/home", "views/home.html", "HomeController", "ctrl");
+    createRoute("/search", "views/search.html", "SearchController", "ctrl");
+    $routeProvider.otherwise({ redirectTo: "/home" });
 }]);
 
 app.run(["$log", function ($log: angular.ILogService) {

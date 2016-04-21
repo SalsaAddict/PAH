@@ -1,4 +1,5 @@
 ﻿/// <reference path="../typings/angularjs/angular.d.ts" />
+/// <reference path="../typings/angular-material/angular-material.d.ts" />
 
 declare var FB: any, YT: any;
 
@@ -15,11 +16,25 @@ module PAH {
         locale: string;
         timezone: string;
     }
+    export function IsBlank(expression: any): boolean {
+        if (expression === undefined) { return true; }
+        if (expression === null) { return true; }
+        if (expression === NaN) { return true; }
+        if (expression === {}) { return true; }
+        if (expression === []) { return true; }
+        if (String(expression).trim().length === 0) { return true; }
+        return false;
+    }
+    export function IfBlank(expression: any, defaultValue: any = undefined): any {
+        return (IsBlank(expression)) ? defaultValue : expression;
+    }
     export class Service {
-        static $inject: string[] = ["$mdToast", "$mdSidenav", "$log"];
+        static $inject: string[] = ["$rootScope", "$http", "$mdToast", "$mdSidenav", "$log"];
         constructor(
-            private $mdToast: any,
-            private $mdSidenav: any,
+            private $rootScope: angular.IRootScopeService,
+            private $http: angular.IHttpService,
+            private $mdToast: angular.material.IToastService,
+            private $mdSidenav: angular.material.ISidenavService,
             private $log: angular.ILogService) { }
         user: IFacebookUser = undefined;
         login = () => { FB.login(); }
@@ -30,6 +45,24 @@ module PAH {
         }
         toast = (message: string) => {
             this.$mdToast.show(this.$mdToast.simple().textContent(message).position("top right"));
+        }
+        execute = (procedure: Procedure.IProcedure): angular.IPromise<any> => {
+            return this.$http.post("/execute.ashx", procedure);
+        }
+    }
+    export module Procedure {
+        export interface IProcedure {
+            name: string;
+            parameters?: Parameter.IParameter[];
+            property?: string;
+            nonQuery?: boolean;
+        }
+        export module Parameter {
+            export interface IParameter {
+                name: string;
+                value: any;
+                isObject: boolean;
+            }
         }
     }
     export interface IWindowService extends angular.IWindowService { fbAsyncInit: Function; }
@@ -42,7 +75,7 @@ pah.service("$pah", PAH.Service);
 
 pah.config(["$logProvider", "$mdThemingProvider", function (
     $logProvider: angular.ILogProvider,
-    $mdThemingProvider: any) {
+    $mdThemingProvider: angular.material.IThemingProvider) {
     $logProvider.debugEnabled(document.getElementById("pahScript").getAttribute("data-debug") === "true");
     $mdThemingProvider.theme("default")
         .primaryPalette("blue")
@@ -56,33 +89,32 @@ pah.run(["$window", "$rootScope", "$locale", "$pah", "$mdSidenav", "$log", funct
     $rootScope: PAH.IRootScopeService,
     $locale: angular.ILocaleService,
     $pah: PAH.Service,
-    $mdSidenav: any,
+    $mdSidenav: angular.material.ISidenavService,
     $log: angular.ILogService) {
     $rootScope.$pah = $pah;
     $window.fbAsyncInit = function () {
-        FB.Event.subscribe("auth.authResponseChange", function (response: any) {
-            if (response.status === "connected") {
+        FB.Event.subscribe("auth.authResponseChange", function (authResponse: any) {
+            if (authResponse.status === "connected") {
                 FB.api("/me", {
-                    access_token: response.authResponse.accessToken,
+                    access_token: authResponse.authResponse.accessToken,
                     fields: ["id", "name", "first_name", "last_name", "gender", "birthday", "email", "timezone", "locale"]
-                }, function (response: any) {
+                }, function (apiResponse: any) {
                     $rootScope.$apply(function () {
-                        $pah.user = response;
+                        $pah.user = apiResponse;
                         $pah.toast("Hello " + $pah.user.first_name + "!");
-                        $log.debug("FB login", response);
+                        $log.debug("FB login", apiResponse);
                     });
                 });
             } else {
                 $rootScope.$apply(function () {
                     $pah.toast("Goodbye " + $pah.user.first_name + "!");
                     delete $pah.user;
-                    $log.debug("FB logout", response);
+                    $log.debug("FB logout", authResponse);
                 });
             }
         });
         var fbInit: any = {
             appId: "693765580666719",
-            channelUrl: "channel.html",
             status: true,
             cookie: true,
             xfbml: true,
