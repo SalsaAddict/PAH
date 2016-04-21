@@ -6,6 +6,7 @@ using System.Web;
 using System.Data;
 using System.Data.SqlClient;
 using System.Xml;
+using System;
 
 namespace PAH
 {
@@ -60,37 +61,52 @@ namespace PAH
         {
             Context.Response.ContentType = "application/json";
             Context.Response.ContentEncoding = Encoding.UTF8;
-            using (StreamReader Reader = new StreamReader(Context.Request.InputStream, Encoding.UTF8))
+            try
             {
-                Procedure Procedure = JsonConvert.DeserializeObject<Procedure>(Reader.ReadToEnd());
-                using (SqlConnection Connection = new SqlConnection(Global.ConnectionString))
+                using (StreamReader Reader = new StreamReader(Context.Request.InputStream, Encoding.UTF8))
                 {
-                    Connection.Open();
-                    using (SqlTransaction Transaction = Connection.BeginTransaction(IsolationLevel.Serializable))
+                    Procedure Procedure = JsonConvert.DeserializeObject<Procedure>(Reader.ReadToEnd());
+                    using (SqlConnection Connection = new SqlConnection(Global.ConnectionString))
                     {
-                        using (SqlCommand Command = new SqlCommand(Procedure.Name, Connection, Transaction))
+                        Connection.Open();
+                        using (SqlTransaction Transaction = Connection.BeginTransaction(IsolationLevel.Serializable))
                         {
-                            Command.CommandType = CommandType.StoredProcedure;
-                            if (Procedure.NonQuery)
+                            try
                             {
-                                Command.ExecuteNonQuery();
-                            }
-                            else
-                            {
-                                using (XmlReader XmlReader = Command.ExecuteXmlReader())
+                                using (SqlCommand Command = new SqlCommand(Procedure.Name, Connection, Transaction))
                                 {
-                                    XmlDocument Document = new XmlDocument();
-                                    Document.Load(XmlReader);
-                                    XmlReader.Close();
-                                    Response Response = new Response(JsonConvert.DeserializeObject(JsonConvert.SerializeXmlNode(Document, Newtonsoft.Json.Formatting.None, true)));
-                                    Context.Response.Write(JsonConvert.SerializeObject(Response));
+                                    Command.CommandType = CommandType.StoredProcedure;
+                                    if (Procedure.NonQuery)
+                                    {
+                                        Command.ExecuteNonQuery();
+                                    }
+                                    else
+                                    {
+                                        using (XmlReader XmlReader = Command.ExecuteXmlReader())
+                                        {
+                                            XmlDocument Document = new XmlDocument();
+                                            Document.Load(XmlReader);
+                                            XmlReader.Close();
+                                            Response Response = new Response(JsonConvert.DeserializeObject(JsonConvert.SerializeXmlNode(Document, Newtonsoft.Json.Formatting.None, true)));
+                                            Context.Response.Write(JsonConvert.SerializeObject(Response));
+                                        }
+                                    }
                                 }
+                                Transaction.Commit();
+                            }
+                            catch (Exception Ex)
+                            {
+                                Transaction.Rollback();
+                                throw Ex;
                             }
                         }
-                        Transaction.Commit();
+                        Connection.Close();
                     }
-                    Connection.Close();
                 }
+            }
+            catch (Exception Ex)
+            {
+                Context.Response.Write(JsonConvert.SerializeObject(new Response(Ex.Message)));
             }
         }
         public bool IsReusable { get { return false; } }

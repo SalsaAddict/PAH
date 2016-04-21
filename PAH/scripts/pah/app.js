@@ -12,9 +12,8 @@ var APP;
                 this.$scope = $scope;
                 this.$pah = $pah;
                 this.$log = $log;
-                $pah.execute({ name: "apiGenres", nonQuery: false }).then(function (response) {
-                    _this.$scope.data = response.data;
-                    _this.$log.debug(Object.getOwnPropertyNames(response.data.data));
+                $pah.execute({ name: "apiGenres", nonQuery: false, root: "array" }).then(function (response) {
+                    _this.$scope.data = response;
                 });
             }
             Controller.$inject = ["$scope", "$pah", "$log"];

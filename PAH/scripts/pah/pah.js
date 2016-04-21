@@ -49,7 +49,27 @@ var PAH;
                 _this.$mdToast.show(_this.$mdToast.simple().textContent(message).position("top right"));
             };
             this.execute = function (procedure) {
-                return _this.$http.post("/execute.ashx", procedure);
+                return _this.$http.post("/execute.ashx", procedure).then(function (response) {
+                    _this.$log.debug(response);
+                    if (response.data.success) {
+                        if (IsBlank(procedure.root)) {
+                            return response.data.data;
+                        }
+                        else {
+                            return response.data.data[procedure.root];
+                        }
+                    }
+                    else {
+                        var message = IfBlank(response.data.error, "Unexpected Error");
+                        if (message.substr(0, 4) === "pah:") {
+                            _this.toast(message.substr(5));
+                        }
+                        else {
+                            _this.toast("An unexpected error occurred");
+                            _this.$log.debug(message);
+                        }
+                    }
+                });
             };
         }
         Service.$inject = ["$rootScope", "$http", "$mdToast", "$mdSidenav", "$log"];

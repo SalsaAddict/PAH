@@ -47,15 +47,32 @@ module PAH {
             this.$mdToast.show(this.$mdToast.simple().textContent(message).position("top right"));
         }
         execute = (procedure: Procedure.IProcedure): angular.IPromise<any> => {
-            return this.$http.post("/execute.ashx", procedure);
+            return this.$http.post("/execute.ashx", procedure).then((response: any) => {
+                this.$log.debug(response);
+                if (response.data.success) {
+                    if (IsBlank(procedure.root)) {
+                        return response.data.data;
+                    } else {
+                        return response.data.data[procedure.root];
+                    }
+                } else {
+                    var message: string = IfBlank(response.data.error, "Unexpected Error");
+                    if (message.substr(0, 4) === "pah:") {
+                        this.toast(message.substr(5));
+                    } else {
+                        this.toast("An unexpected error occurred");
+                        this.$log.debug(message);
+                    }
+                }
+            });
         }
     }
     export module Procedure {
         export interface IProcedure {
             name: string;
             parameters?: Parameter.IParameter[];
-            property?: string;
             nonQuery?: boolean;
+            root?: string;
         }
         export module Parameter {
             export interface IParameter {

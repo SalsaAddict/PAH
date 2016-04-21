@@ -12,9 +12,8 @@ module APP {
                 private $scope: IScope,
                 private $pah: PAH.Service,
                 private $log: angular.ILogService) {
-                $pah.execute({ name: "apiGenres", nonQuery: false }).then((response: any) => {
-                    this.$scope.data = response.data;
-                    this.$log.debug(Object.getOwnPropertyNames(response.data.data));
+                $pah.execute({ name: "apiGenres", nonQuery: false, root: "array" }).then((response: any) => {
+                    this.$scope.data = response;
                 });
             }
         }
