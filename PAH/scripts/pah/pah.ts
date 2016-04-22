@@ -15,6 +15,7 @@ module PAH {
         email: string;
         locale: string;
         timezone: string;
+        friends: any[]
     }
     export function IsBlank(expression: any): boolean {
         if (expression === undefined) { return true; }
@@ -29,15 +30,15 @@ module PAH {
         return (IsBlank(expression)) ? defaultValue : expression;
     }
     export class Service {
-        static $inject: string[] = ["$rootScope", "$http", "$mdToast", "$mdSidenav", "$log"];
+        static $inject: string[] = ["$parse", "$http", "$mdToast", "$mdSidenav", "$log"];
         constructor(
-            private $rootScope: angular.IRootScopeService,
+            private $parse: angular.IParseService,
             private $http: angular.IHttpService,
             private $mdToast: angular.material.IToastService,
             private $mdSidenav: angular.material.ISidenavService,
             private $log: angular.ILogService) { }
         user: IFacebookUser = undefined;
-        login = () => { FB.login(); }
+        login = () => { FB.login(null, { scope: "user_friends" }); }
         logout = () => { FB.logout(); }
         toggleMenu = () => {
             this.$mdSidenav("left").toggle();
@@ -46,23 +47,23 @@ module PAH {
         toast = (message: string) => {
             this.$mdToast.show(this.$mdToast.simple().textContent(message).position("top right"));
         }
-        execute = (procedure: Procedure.IProcedure): angular.IPromise<any> => {
-            return this.$http.post("/execute.ashx", procedure).then((response: any) => {
+        execute = (procedure: Procedure.IProcedure, $scope?: angular.IScope, expression?: string): angular.IPromise<any> => {
+            return this.$http.post("/execute.ashx", procedure).then((response: { data: { success: boolean; data: any; error: string; } }) => {
                 this.$log.debug(response);
                 if (response.data.success) {
-                    if (IsBlank(procedure.root)) {
-                        return response.data.data;
-                    } else {
-                        return response.data.data[procedure.root];
+                    if (!IsBlank($scope)) {
+                        this.$parse(IfBlank(expression, procedure.name)).assign($scope, response.data.data);
                     }
+                    return response.data.data;
                 } else {
                     var message: string = IfBlank(response.data.error, "Unexpected Error");
                     if (message.substr(0, 4) === "pah:") {
                         this.toast(message.substr(5));
                     } else {
                         this.toast("An unexpected error occurred");
-                        this.$log.debug(message);
+                        this.$log.debug("PAH execute error:", procedure.name, message);
                     }
+                    return;
                 }
             });
         }
@@ -120,6 +121,15 @@ pah.run(["$window", "$rootScope", "$locale", "$pah", "$mdSidenav", "$log", funct
                         $pah.user = apiResponse;
                         $pah.toast("Hello " + $pah.user.first_name + "!");
                         $log.debug("FB login", apiResponse);
+                        FB.api("/me/friends", {
+                            access_token: authResponse.authResponse.accessToken,
+                            fields: ["id"]
+                        }, function (apiResponse: any) {
+                            $rootScope.$apply(function () {
+                                $pah.user.friends = apiResponse;
+                                $log.debug("FB login", apiResponse);
+                            });
+                        });
                     });
                 });
             } else {
@@ -131,8 +141,8 @@ pah.run(["$window", "$rootScope", "$locale", "$pah", "$mdSidenav", "$log", funct
             }
         });
         var fbInit: any = {
-            appId: "693765580666719",
-            status: true,
+            appId: "1376598962611648", // "693765580666719",
+            status: false,
             cookie: true,
             xfbml: true,
             version: "v2.5"

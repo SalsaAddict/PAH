@@ -50,8 +50,10 @@ GO
 CREATE TABLE [Genre] (
 		[Id] TINYINT NOT NULL IDENTITY (1, 1),
 		[Name] NVARCHAR(25) NOT NULL,
+		[Sort] TINYINT NOT NULL,
 		CONSTRAINT [PK_Genre] PRIMARY KEY NONCLUSTERED ([Id]),
-		CONSTRAINT [UQ_Genre_Name] UNIQUE CLUSTERED ([Name])
+		CONSTRAINT [UQ_Genre_Name] UNIQUE CLUSTERED ([Name]),
+		CONSTRAINT [UQ_Genre_Sort] UNIQUE ([Sort])
 	)
 GO
 
@@ -67,19 +69,19 @@ BEGIN
 		[Name]
 	FROM [Genre]
 	WITH (NOLOCK)
-	ORDER BY [Name]
-	FOR XML PATH (N'array'), ROOT (N'data')
+	ORDER BY [Sort]
+	FOR XML PATH (N'Genres'), ROOT (N'Array')
 	RETURN
 END
 GO
 
 SET IDENTITY_INSERT [Genre] ON
-INSERT INTO [Genre] ([Id], [Name])
+INSERT INTO [Genre] ([Id], [Name], [Sort])
 VALUES
-	(1, N'Salsa'),
-	(2, N'Bachata'),
-	(3, N'Kizomba'),
-	(4, N'Cha-Cha')
+	(1, N'Salsa', 1),
+	(2, N'Bachata', 2),
+	(3, N'Kizomba', 3),
+	(4, N'Cha-Cha', 4)
 SET IDENTITY_INSERT [Genre] OFF
 GO
 

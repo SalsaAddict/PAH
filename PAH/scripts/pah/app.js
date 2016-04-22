@@ -8,13 +8,10 @@ var APP;
     (function (Home) {
         var Controller = (function () {
             function Controller($scope, $pah, $log) {
-                var _this = this;
                 this.$scope = $scope;
                 this.$pah = $pah;
                 this.$log = $log;
-                $pah.execute({ name: "apiGenres", nonQuery: false, root: "array" }).then(function (response) {
-                    _this.$scope.data = response;
-                });
+                $pah.execute({ name: "apiGenres" }, $scope);
             }
             Controller.$inject = ["$scope", "$pah", "$log"];
             return Controller;

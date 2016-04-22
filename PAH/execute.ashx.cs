@@ -7,6 +7,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Xml;
 using System;
+using System.Reflection;
 
 namespace PAH
 {
@@ -21,7 +22,7 @@ namespace PAH
             public List<Parameter> Parameters { get; set; } = new List<Parameter>();
 
             [JsonProperty("nonQuery")]
-            public bool NonQuery { get; set; } = true;
+            public bool NonQuery { get; set; } = false;
 
             public class Parameter
             {
@@ -87,7 +88,9 @@ namespace PAH
                                             XmlDocument Document = new XmlDocument();
                                             Document.Load(XmlReader);
                                             XmlReader.Close();
-                                            Response Response = new Response(JsonConvert.DeserializeObject(JsonConvert.SerializeXmlNode(Document, Newtonsoft.Json.Formatting.None, true)));
+                                            dynamic Data = JsonConvert.DeserializeObject(JsonConvert.SerializeXmlNode(Document, Newtonsoft.Json.Formatting.None, true));
+                                            if (Document.FirstChild.Name.ToLower() == "array") Data = Data[Document.FirstChild.FirstChild.Name];
+                                            Response Response = new Response(Data);
                                             Context.Response.Write(JsonConvert.SerializeObject(Response));
                                         }
                                     }

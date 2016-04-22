@@ -12,9 +12,7 @@ module APP {
                 private $scope: IScope,
                 private $pah: PAH.Service,
                 private $log: angular.ILogService) {
-                $pah.execute({ name: "apiGenres", nonQuery: false, root: "array" }).then((response: any) => {
-                    this.$scope.data = response;
-                });
+                $pah.execute({ name: "apiGenres" }, $scope);
             }
         }
     }
