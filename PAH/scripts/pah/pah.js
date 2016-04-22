@@ -46,38 +46,57 @@ var PAH;
                 _this.$log.debug("PAH toggleMenu");
             };
             this.toast = function (message) {
-                _this.$mdToast.show(_this.$mdToast.simple().textContent(message).position("top right"));
-            };
-            this.execute = function (procedure, $scope, expression) {
-                return _this.$http.post("/execute.ashx", procedure).then(function (response) {
-                    _this.$log.debug(response);
-                    if (response.data.success) {
-                        if (!IsBlank($scope)) {
-                            _this.$parse(IfBlank(expression, procedure.name)).assign($scope, response.data.data);
-                        }
-                        return response.data.data;
-                    }
-                    else {
-                        var message = IfBlank(response.data.error, "Unexpected Error");
-                        if (message.substr(0, 4) === "pah:") {
-                            _this.toast(message.substr(5));
-                        }
-                        else {
-                            _this.toast("An unexpected error occurred");
-                            _this.$log.debug("PAH execute error:", procedure.name, message);
-                        }
-                        return;
-                    }
-                });
+                _this.$mdToast.show(_this.$mdToast.simple()
+                    .textContent(message)
+                    .position("top right"));
             };
         }
         Service.$inject = ["$parse", "$http", "$mdToast", "$mdSidenav", "$log"];
         return Service;
     }());
     PAH.Service = Service;
+    var Procedure;
+    (function (Procedure) {
+        var Service = (function () {
+            function Service($http, $parse, $pah, $log) {
+                var _this = this;
+                this.$http = $http;
+                this.$parse = $parse;
+                this.$pah = $pah;
+                this.$log = $log;
+                this.execute = function (procedure, $scope, expression) {
+                    var nonQuery = ($scope) ? false : true;
+                    procedure.nonQuery = nonQuery;
+                    return _this.$http.post("/execute.ashx", procedure)
+                        .then(function (response) {
+                        if (response.data.success) {
+                            if (!nonQuery) {
+                                _this.$parse(IfBlank(expression, procedure.name))
+                                    .assign($scope, response.data.data);
+                            }
+                        }
+                        else {
+                            var error = IfBlank(response.data.error, "Unknown Error");
+                            if (error.substr(0, 4) === "pah:") {
+                                _this.$pah.toast(error.substr(5));
+                            }
+                            else {
+                                _this.$pah.toast("An unknown error occurred");
+                                _this.$log.debug(error);
+                            }
+                        }
+                    });
+                };
+            }
+            Service.$inject = ["$http", "$parse", "$pah", "$log"];
+            return Service;
+        }());
+        Procedure.Service = Service;
+    })(Procedure = PAH.Procedure || (PAH.Procedure = {}));
 })(PAH || (PAH = {}));
 var pah = angular.module("pah", ["ngRoute", "ngMaterial"]);
 pah.service("$pah", PAH.Service);
+pah.service("$procedure", PAH.Procedure.Service);
 pah.config(["$logProvider", "$mdThemingProvider", function ($logProvider, $mdThemingProvider) {
         $logProvider.debugEnabled(document.getElementById("pahScript").getAttribute("data-debug") === "true");
         $mdThemingProvider.theme("default")

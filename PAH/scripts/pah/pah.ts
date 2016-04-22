@@ -45,35 +45,44 @@ module PAH {
             this.$log.debug("PAH toggleMenu");
         }
         toast = (message: string) => {
-            this.$mdToast.show(this.$mdToast.simple().textContent(message).position("top right"));
-        }
-        execute = (procedure: Procedure.IProcedure, $scope?: angular.IScope, expression?: string): angular.IPromise<any> => {
-            return this.$http.post("/execute.ashx", procedure).then((response: { data: { success: boolean; data: any; error: string; } }) => {
-                this.$log.debug(response);
-                if (response.data.success) {
-                    if (!IsBlank($scope)) {
-                        this.$parse(IfBlank(expression, procedure.name)).assign($scope, response.data.data);
-                    }
-                    return response.data.data;
-                } else {
-                    var message: string = IfBlank(response.data.error, "Unexpected Error");
-                    if (message.substr(0, 4) === "pah:") {
-                        this.toast(message.substr(5));
-                    } else {
-                        this.toast("An unexpected error occurred");
-                        this.$log.debug("PAH execute error:", procedure.name, message);
-                    }
-                    return;
-                }
-            });
+            this.$mdToast.show(this.$mdToast.simple()
+                .textContent(message)
+                .position("top right"));
         }
     }
     export module Procedure {
-        export interface IProcedure {
-            name: string;
-            parameters?: Parameter.IParameter[];
-            nonQuery?: boolean;
-            root?: string;
+        export interface IProcedure { name: string; parameters?: Parameter.IParameter[]; }
+        interface IPost extends IProcedure { nonQuery: boolean; }
+        interface IResponse { data: { success: boolean; data?: any; error?: string; } }
+        export class Service {
+            static $inject: string[] = ["$http", "$parse", "$pah", "$log"];
+            constructor(
+                private $http: angular.IHttpService,
+                private $parse: angular.IParseService,
+                private $pah: PAH.Service,
+                private $log: angular.ILogService) { }
+            execute = (procedure: IProcedure, $scope?: angular.IScope, expression?: string) => {
+                var nonQuery: boolean = ($scope) ? false : true;
+                (procedure as IPost).nonQuery = nonQuery;
+                return this.$http.post("/execute.ashx", procedure)
+                    .then((response: IResponse) => {
+                        if (response.data.success) {
+                            if (!nonQuery) {
+                                this.$parse(IfBlank(expression, procedure.name))
+                                    .assign($scope, response.data.data);
+                            }
+                        } else {
+                            var error: string = IfBlank(response.data.error, "Unknown Error");
+                            if (error.substr(0, 4) === "pah:") {
+                                this.$pah.toast(error.substr(5));
+                            } else {
+                                this.$pah.toast("An unknown error occurred");
+                                this.$log.debug(error);
+                            }
+                        }
+                    });
+
+            }
         }
         export module Parameter {
             export interface IParameter {
@@ -90,6 +99,7 @@ module PAH {
 var pah: angular.IModule = angular.module("pah", ["ngRoute", "ngMaterial"]);
 
 pah.service("$pah", PAH.Service);
+pah.service("$procedure", PAH.Procedure.Service);
 
 pah.config(["$logProvider", "$mdThemingProvider", function (
     $logProvider: angular.ILogProvider,
