@@ -7,13 +7,14 @@ var APP;
     var Home;
     (function (Home) {
         var Controller = (function () {
-            function Controller($scope, $pah, $log) {
+            function Controller($scope, $pah, $procedure, $log) {
                 this.$scope = $scope;
                 this.$pah = $pah;
+                this.$procedure = $procedure;
                 this.$log = $log;
-                $pah.execute({ name: "apiGenres" }, $scope);
+                $procedure.execute({ name: "apiGenres" }, $scope);
             }
-            Controller.$inject = ["$scope", "$pah", "$log"];
+            Controller.$inject = ["$scope", "$pah", "$procedure", "$log"];
             return Controller;
         }());
         Home.Controller = Controller;

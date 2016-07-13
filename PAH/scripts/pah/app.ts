@@ -7,12 +7,13 @@ module APP {
     export module Home {
         export interface IScope extends angular.IScope { data: any; }
         export class Controller {
-            static $inject: string[] = ["$scope", "$pah", "$log"];
+            static $inject: string[] = ["$scope", "$pah", "$procedure", "$log"];
             constructor(
                 private $scope: IScope,
                 private $pah: PAH.Service,
+                private $procedure: PAH.Procedure.Service,
                 private $log: angular.ILogService) {
-                $pah.execute({ name: "apiGenres" }, $scope);
+                $procedure.execute({ name: "apiGenres" }, $scope);
             }
         }
     }
