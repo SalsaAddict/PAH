@@ -1,14 +1,14 @@
 [
   {
-    "outputFileName": "scripts/pah/pah.js",
+    "outputFileName": "scripts/pah/app.min.js",
     "inputFiles": [
-      "scripts/pah/pah.js"
+      "scripts/pah/app.js"
     ]
   },
   {
-    "outputFileName": "scripts/pah/app.js",
+    "outputFileName": "scripts/pah/pah.min.js",
     "inputFiles": [
-      "scripts/pah/app.js"
+      "scripts/pah/pah.js"
     ]
   }
 ]

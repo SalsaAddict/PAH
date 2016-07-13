@@ -152,3 +152,4 @@ pah.run(["$window", "$rootScope", "$locale", "$pah", "$mdSidenav", "$log", funct
     };
     $log.debug("PAH running (", $locale.id, ")");
 }]);
+

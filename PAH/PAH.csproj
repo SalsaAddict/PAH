@@ -78,12 +78,24 @@
     <Content Include="index.aspx" />
     <Content Include="packages.config" />
     <None Include="bundleconfig.json" />
-    <Content Include="scripts\pah\app.js" />
+    <Content Include="scripts\pah\app.js">
+      <DependentUpon>app.ts</DependentUpon>
+    </Content>
+    <Content Include="scripts\pah\app.js.map">
+      <DependentUpon>app.ts</DependentUpon>
+    </Content>
     <Content Include="scripts\pah\app.min.js">
       <DependentUpon>app.js</DependentUpon>
     </Content>
-    <Content Include="scripts\pah\pah.js.map" />
-    <Content Include="scripts\pah\app.js.map" />
+    <Content Include="scripts\pah\pah.js">
+      <DependentUpon>pah.ts</DependentUpon>
+    </Content>
+    <Content Include="scripts\pah\pah.js.map">
+      <DependentUpon>pah.ts</DependentUpon>
+    </Content>
+    <Content Include="scripts\pah\pah.min.js">
+      <DependentUpon>pah.js</DependentUpon>
+    </Content>
     <Content Include="scripts\tsconfig.json" />
     <Content Include="execute.ashx" />
     <None Include="Web.Debug.config">
@@ -95,10 +107,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="scripts\_references.js" />
-    <Content Include="scripts\pah\pah.js" />
-    <Content Include="scripts\pah\pah.min.js">
-      <DependentUpon>pah.js</DependentUpon>
-    </Content>
     <Content Include="sql\1. Setup.sql" />
     <Content Include="views\home.html" />
     <Content Include="views\search.html" />
